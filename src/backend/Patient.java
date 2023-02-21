@@ -1,84 +1,104 @@
-/** 
- * Patient.java
- * author: Matt Ellis
- * Patient attributes include:
- * 		a unique patient id
- *  	the patient's response to treatment
- *  	the patient's predicted response to treatment
- *  	a list of the patient's normalized protein expression level for 4776 proteins
- * Note: The patient's predicted response is calculated using their 3698th and 3259th protein levels
- */
 package backend;
 
 import java.util.ArrayList;
 
-public class Patient {	
-	private String id;
-	private String rspns;
-	private String predRspns;
-	private ArrayList<Double> proteinLvl;
-	private static final int PROTEIN1 = 3698;
-	private static final int PROTEIN2 = 3259;
+/**
+ * Patient attributes include:
+ * <ul><li>a unique patient id</li>
+ * <li>the patient's predicted response to treatment</li>
+ * <li>the patient's response to treatment</li>
+ * <li>a list of the patient's normalized protein expression level for 4776 proteins</li></ul>
+ * <p>
+ * Note: The patient's predicted response is calculated using their 3698th and 3259th protein levels
+ *
+ * @author Matt Ellis
+ */
+public class Patient {
+    private String id;
+    private String rspns;
+    private String predRspns;
+    private ArrayList<Double> proteins;
+    private static final int PROTEIN1 = 3698;
+    private static final int PROTEIN2 = 3259;
 
-	public Patient() {
-		proteinLvl = new ArrayList<Double>();
-	}
+    public Patient() {
+        proteins = new ArrayList<>();
+    }
 
-	public Patient(String id, ArrayList<Double> proteinLvl) {	
-		// constructor used while adding new patients from a csv file to a patientCollection
-		this();
-		this.id = id;
-		this.proteinLvl = proteinLvl;				
-		predictResponse();
-		rspns = "unk"; 
-	}
+    /**
+     * Constructor used when adding new patients from a file
+     *
+     * @param id       patient id
+     * @param proteins patient's protein levels
+     */
+    public Patient(String id, ArrayList<Double> proteins) {
+        this();
+        setId(id);
+        setProteins(proteins);
+        predictResponse();
+        setResponse("unk"); // new patient hasn't yet received treatment
+    }
 
-	public Patient(String id, String rspns, String predRspns, ArrayList<Double> proteinLvl) {
-		// constructor used while reading existing patients from patientCollection csv file 
-		this();
-		this.id = id;
-		this.rspns = rspns;
-		this.predRspns = predRspns;
-		this.proteinLvl = proteinLvl;
-	}
+    /**
+     * Constructor used when reading existing patients from a collection csv file
+     *
+     * @param id        patient id
+     * @param rspns     patient's treatment response
+     * @param predRspns patient's predicated response
+     * @param proteins  patient's protein levels
+     */
+    public Patient(String id, String rspns, String predRspns, ArrayList<Double> proteins) {
+        this();
+        setId(id);
+        setResponse(rspns);
+        setPredict(predRspns);
+        setProteins(proteins);
+    }
 
-	public void predictResponse() {
-		predRspns = Predictor.predict(proteinLvl.get(PROTEIN1 - 1), proteinLvl.get(PROTEIN2 - 1));
-	}
+    /**
+     * Predicts patient's response to treatment
+     */
+    public void predictResponse() {
+        predRspns = Predictor.predict(proteins.get(PROTEIN1 - 1), proteins.get(PROTEIN2 - 1));
+    }
 
-	public String getId() {
-		return id;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public String getResponse() {
-		return rspns;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setResponse(String rspns) {
-		this.rspns = rspns;
-	}
+    public String getResponse() {
+        return rspns;
+    }
 
-	public ArrayList<Double> getProteinLvl() {
-		return proteinLvl;
-	}
+    public void setResponse(String rspns) {
+        this.rspns = rspns;
+    }
 
-	public void setProteinLvl(ArrayList<Double> proteinLvl) {
-		this.proteinLvl = proteinLvl;
-	}
+    public ArrayList<Double> getProteins() {
+        return proteins;
+    }
 
-	public void setPredict(String predRspns) {
-		this.predRspns = predRspns;
-	} 
+    public void setProteins(ArrayList<Double> proteins) {
+        this.proteins = proteins;
+    }
 
-	public String getPredict() {
-		return predRspns; 
-	}
+    public void setPredict(String predRspns) {
+        this.predRspns = predRspns;
+    }
 
-	public String toString() {
-		String toReturn = "[Id] " + getId() + ", [Response] " + getResponse() + ", [Predicted] " + getPredict()
-				+ ", [Protein " + PROTEIN1 + "] " + proteinLvl.get(PROTEIN1 - 1) + ", [Protein " + PROTEIN2 + "] "
-				+ proteinLvl.get(PROTEIN2 - 1) + "\n";
-		return toReturn;
-	}
+    public String getPredict() {
+        return predRspns;
+    }
+
+    public String toString() {
+        String toReturn = "[Id] " + getId() + ", [Response] " + getResponse() + ", [Predicted] " + getPredict()
+                + ", [Protein " + PROTEIN1 + "] " + proteins.get(PROTEIN1 - 1) + ", [Protein " + PROTEIN2 + "] "
+                + proteins.get(PROTEIN2 - 1) + "\n";
+        return toReturn;
+    }
 
 }
